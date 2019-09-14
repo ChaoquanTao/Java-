@@ -9,13 +9,53 @@ categories: Java
 
 ### 自动拆装箱
 
-- 为什么Java中有自动拆装箱
+#### 为什么Java中有自动拆装箱
 
 Java是一门面向对象的语言，如果只有八种基本类型`byte`,  `short`,`int`, `long`, `float`, `double`, `char`, `bool`，在计算上是简单的，但是在面向对象的操作上是麻烦的，比如向集合类添加元素就只能添加包装类型而不能添加基本类型。反之，包装类型是对象，存放在堆上，占用空间大，而基本类型存放在栈中。
 
-- 包装类型和基本类型之间的比较
+#### 自动拆装箱中的缓存机制
 
-包装类型和包装类型比较，比较的是对象的地址；包装类型和基本类型比较，是先将包装类型拆箱再同基本类型比较。
+在自动装箱的时候，高频区域的数值存在缓存，会直接使用已有的对象。各个包装类型的缓存范围如下
+
+| 包装类型  | 缓存范围 |
+| --------- | -------- |
+| Byte      | -128~127 |
+| Short     | -128~127 |
+| Character | 0~127    |
+| Long      | -128~127 |
+| Integer   | -128~127 |
+
+看以下代码：
+
+```
+public static void main(String[] args) {
+        Integer a = 100;
+        Integer b = 100;
+        System.out.println(a==b);
+        System.out.println(a.equals(b));
+
+        Integer c= 200;
+        Integer d = 200;
+        System.out.println(c==d);
+        System.out.println(c.equals(d));
+    }
+```
+
+输出：
+
+```
+true
+true
+false
+true
+```
+
+`==`比较的是对象地址，`equals`比较的是值。可以发现，在缓存范围内，对象a和b的地址是相同的。
+
+#### 包装类型和基本类型之间的互相比较
+
++ 包装类型和包装类型比较，`==`比较的是对象的地址, `equals`比较的是值；
++ 包装类型和基本类型比较，无论是`==`还是`equals`，比较的都是值，先将包装类型拆箱再同基本类型比较。
 
 
 
@@ -103,9 +143,23 @@ public boolean equals(Object obj) {
 
 ### Java集合类
 
+#### `HashMap` `ConcurrentHashMap`
+
+[Java集合类之HashMap](<https://chaoquantao.github.io/2019/07/09/%E8%B0%88%E4%B8%80%E8%B0%88Java%E9%9B%86%E5%90%88%E7%B1%BB%E4%B9%8BHashMap/>)
+
+#### `TreeMap`
+
+底层由红黑树实现。映射根据其键的自然顺序进行排序，或者根据创建映射时提供的 Comparator进行排序，具体取决于使用的构造方法。所以是个有序的key-value集合。
+
+### 并发
+
+#### Java中的锁
+
+[Java中的锁](<https://chaoquantao.github.io/2019/09/13/Java%E4%B8%AD%E7%9A%84%E9%94%81/>)
+
+#### `synchronized`
+
+[Java中的synchronized关键字](https://chaoquantao.github.io/2019/09/13/Java%E4%B8%AD%E7%9A%84synchronized%E5%85%B3%E9%94%AE%E5%AD%97/)
 
 
-
-
-### `synchronized`
 
