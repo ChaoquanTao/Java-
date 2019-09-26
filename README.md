@@ -151,6 +151,32 @@ public boolean equals(Object obj) {
 
 底层由红黑树实现。映射根据其键的自然顺序进行排序，或者根据创建映射时提供的 Comparator进行排序，具体取决于使用的构造方法。所以是个有序的key-value集合。
 
+#### 常见集合类接口
+
+set, list, map
+
+其中set, list都实现了Collection接口， 而map没有
+
+ Collection   
+├List   
+│├LinkedList   
+│├ArrayList   
+│└Vector   
+│　└Stack   
+└Set 
+
+#### Collection 和 Collections
+
+Collection是顶层接口，而Collections是一个工具类，里面提供了一些静态方法，比如排序啊，逆序啊等等，不能被实例化。
+
+#### `ArrayList`, `LinkedList` 和Vector
+
+`ArrayList`底层由数组实现，查找快，但是删除和中间插入牵扯到其他元素的移动，速度慢；
+
+`LinkedList`底层由链表实现，删除和插入方便，但是查找起来没有`ArrayList`快；
+
+
+
 ### 并发
 
 #### Java中的锁
