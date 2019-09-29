@@ -4,8 +4,9 @@ date: 2019-09-04 09:27:46
 updated: 2019-09-04 09:27:46
 tags: 面经
 categories: Java
-
 ---
+
+> 持续更新到2020校招结束
 
 ### 自动拆装箱
 
@@ -159,8 +160,8 @@ set, list, map
 
  Collection   
 ├List   
-│├LinkedList   
-│├ArrayList   
+│├`LinkedList   `
+│├`ArrayList   `
 │└Vector   
 │　└Stack   
 └Set 
@@ -175,7 +176,35 @@ Collection是顶层接口，而Collections是一个工具类，里面提供了�
 
 `LinkedList`底层由链表实现，删除和插入方便，但是查找起来没有`ArrayList`快；
 
+Vector线程安全，它的修改结构的方法由synchronized关键字修饰，并且它可以往里面插入不同类型的数据。它的扩容粒度和`ArrayList`也不一样，`ArrayList`扩容1.5倍，Vector扩容一倍或者增量扩容传入的参数。Vector是Java中的遗留容器。
 
+#### `HashMap` 和 `HashTable`
+
+它们都实现了Map接口，
+
+`HashTable`的方法由synchronized修饰，是线程安全的，
+
+`HashTable`键值不能为空，而`HashMap`可以。
+
+#### fail fast 和 fail safe
+
+它俩都是Java集合中的错误检测机制。
+
+当多个线程对非fail safe的集合进行结构上的修改时，就有可能产生fail fast机制，这时候会抛出`ConcurrentModificationException`异常。事实上单线程环境下也有可能出现该异常，主要是由于`modCount`和`expectedModCount`不一致造成的。
+
+fail safe对集合结构的修改是在集合的一个复制品上进行的，所以不会抛出上述错误。但是这种方式更耗内存，而且并不能保证读到的数据是原始数据。
+
+[Java中的fail fast]([https://inewbie.top/2019/09/29/Java%E4%B8%AD%E7%9A%84fail-fast/#more](https://inewbie.top/2019/09/29/Java中的fail-fast/#more))
+
+#### Iterator 和 `ListIterator`
+
+开局一张图
+
+<img src="https://s2.ax1x.com/2019/09/29/uGlP78.png" alt="uGlP78.png" style="zoom:80%;" />
+
+`ListIterator`是List专有的迭代器，继承自Iterator, 前向后向都可以访问（向前访问也是基于当前位置的，所以当前位置如果是0的话，你懂的），并且还多了set, add等方法
+
+Iterator除了List可以用，Set也可以用，只能后向访问，且只能remove，不能add,可以看出`ListIterator`更强大一些（毕竟也是继承下来的对吧），在list中，给两种迭代器都提供了方法。
 
 ### 并发
 
