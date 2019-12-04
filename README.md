@@ -8,6 +8,10 @@ categories: Java
 
 > 持续更新到2020校招结束
 
+### 面向对象语言的特性
+
+封装，继承，多态
+
 ### 自动拆装箱
 
 #### 为什么Java中有自动拆装箱
@@ -138,7 +142,17 @@ public boolean equals(Object obj) {
 5. 非空性，x.equals(null)，永远返回是"false"；x.equals(和x不同类型的对象)永远返回是"false"。
 ```
 
-那么`hashcode()`用在哪里呢？一个最广泛的用途就是哈希表，比如`HashMap`,`HashSet`和`HashTable`,在哈希表中，哈希值用来当作索引，所以考虑以下：对于两个相等（`equals()`返回`true`）的对象，它们在哈希表中应该只存在一个，对于两个不相等但是哈希值相等的对象，它们在哈希表索引相同，这种情况下，如果不重写`hashcode()`,那它们计算出来的值不一样（因为`hashcode()`本来返回的是内存地址），这就不是我们想要的哈希表了。所以说，**在`HashMap中重写equals()`也要重写`hashcode()`**.
+那么`hashcode()`用在哪里呢？一个最广泛的用途就是哈希表，比如`HashMap`,`HashSet`和`HashTable`,在哈希表中，哈希值用来当作索引。
+
+为什么说**在`HashMap中重写equals()`也要重写`hashcode()`**呢？
+
+考虑一下：
+
+以HashMap为例，假设我们只重写了equals方法，认为只有键和值都相等时这两个entry才相等，我们在进行get或put操作时，都需要先根据key来确定存储位置，存储位置的确定需要hash方法和indexFor方法，hash方法中需要使用hashCode进行定位，如果没有重写hashCode方法，那它返回的是这个key的地址，即使两个key值相同，但是地址不同，你用一个新key的地址去hash，你是永远也找不到旧key的位置的。
+
+
+
+
 
 
 
@@ -194,17 +208,25 @@ Vector线程安全，它的修改结构的方法由synchronized关键字修饰�
 
 fail safe对集合结构的修改是在集合的一个复制品上进行的，所以不会抛出上述错误。但是这种方式更耗内存，而且并不能保证读到的数据是原始数据。
 
-[Java中的fail fast]([https://inewbie.top/2019/09/29/Java%E4%B8%AD%E7%9A%84fail-fast/#more](https://inewbie.top/2019/09/29/Java中的fail-fast/#more))
+[Java中的fail fast](https://inewbie.top/2019/09/29/Java%E4%B8%AD%E7%9A%84fail-fast/#more)
 
 #### Iterator 和 `ListIterator`
 
 开局一张图
 
-<img src="https://s2.ax1x.com/2019/09/29/uGlP78.png" alt="uGlP78.png" style="zoom:80%;" />
+<img src="https://s2.ax1x.com/2019/09/29/uGlP78.png" alt="uGlP78.png" style="zoom: 50%;" />
 
 `ListIterator`是List专有的迭代器，继承自Iterator, 前向后向都可以访问（向前访问也是基于当前位置的，所以当前位置如果是0的话，你懂的），并且还多了set, add等方法
 
 Iterator除了List可以用，Set也可以用，只能后向访问，且只能remove，不能add,可以看出`ListIterator`更强大一些（毕竟也是继承下来的对吧），在list中，给两种迭代器都提供了方法。
+
+#### 为什么HashMap的容量是2的次幂
+
+为了计算快捷，引入2的次幂，在二倍扩容以及indexFor的使用取模的方式来取余上，求提高了运算速度，但是同时因为是按照2的次幂取余，会增加冲突，所以1.7版本中在hash函数中也增加了扰动算法来使得散列更加均匀。
+
+[Map中的hash方法]([https://inewbie.top/2019/10/08/Map%E4%B8%AD%E7%9A%84hash%E6%96%B9%E6%B3%95/](https://inewbie.top/2019/10/08/Map中的hash方法/))
+
+
 
 ### 并发
 
@@ -216,5 +238,105 @@ Iterator除了List可以用，Set也可以用，只能后向访问，且只能re
 
 [Java中的synchronized关键字](https://chaoquantao.github.io/2019/09/13/Java%E4%B8%AD%E7%9A%84synchronized%E5%85%B3%E9%94%AE%E5%AD%97/)
 
+#### `synchronized`和`lock`
 
+synchronized修饰，获取锁的线程释放锁只有两种情况：
+
++ 获取锁的线程执行完了该代码块，然后线程释放对锁的占有；
+
++ 线程执行发生异常，此时JVM会让线程自动释放锁。
+
+ 如果这个获取锁的线程由于要等待IO或者其他原因（比如调用sleep方法）被阻塞了，但是又没有释放锁，其他线程便只能干巴巴地等待 ，不能相应中断
+
+
+
+ Lock在发生异常时，如果没有主动通过`unLock()`去释放锁，则很可能造成死锁现象，因此使用Lock时需要在finally块中释放锁；Lock可以让等待锁的线程响应中断 
+
+|                    | synchronized  | Lock                     |
+| ------------------ | ------------- | ------------------------ |
+| 发生异常           | JVM自动释放锁 | 使用`unLock()`手动释放锁 |
+| 等待的线程相应中断 | 不能          | 能                       |
+| 知道线程是否获取锁 | 不能          | 能                       |
+| 语言内置           | 是            | 否                       |
+
+
+
+#### 什么是线程，什么是进程
+
+通俗的讲，进程表示一个任务，线程表示一个任务里的子任务。
+
+具体的讲，进程是资源分配的基本单元，线程是执行的基本单元。同一个进程之间的多个线程共享资源。
+
+
+
+#### Java线程状态
+
+###  ![线程状态图](https://img-blog.csdnimg.cn/20181120173640764.jpeg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3BhbmdlMTk5MQ==,size_16,color_FFFFFF,t_70)
+
+阻塞和等待的区别：
+
+​	等待状态是需要其他线程唤醒的，阻塞状态强调的是在因为没有获取到锁而阻塞，两者的侧重点不同。一个侧重被唤醒，一个侧重获取锁。
+
+
+
+#### 什么是线程安全
+
+多个线程访问共享变量时导致的数据不一致的情况。
+
+
+
+#### `start()`和`run()`
+
+启动一个线程应该用`start()`,而不是`run()`. 
+
++ 调用`start()`方法JVM会创建一个线程并去执行这个线程里的`run()`方法，而调用`run()`方法并不会创建新的线程。
+
++ `start()`不能被重复调用，`run()`可以被重复调用。
+
+
+
+#### 线程同步的几种方式
+
++ `synchronized`
++ `volatile`
++ `Lock`: AQS+Condition (核心在于通过CAS来操作state) ，Lock更像一种人工锁，其核心就是state变量
++ `wait`, `notify`
+
++ `ThreadLocal`：每个线程内部做一份拷贝
++ 阻塞队列：队列+可重入锁+Condition
++ 原子变量: 自旋+CAS
++ 信号量
+
+
+
+#### `sleep`和`yield`的区别
+
+相同点：
+
++ 都是`Thread`类的静态方法
++ 都是让当前线程放弃CPU但不释放锁
+
+不同点：
+
++ `sleep`可以抛出`InterruptedException`异常
+
+
+
+#### 为什么`suspend()`,`resume()`和`stop()`不推荐使用
+
+因为这些方法会使得程序处于不确定状态下。以`suspend()`为例，它使线程暂停，但不会释放已经占有的线程资源（比如锁）。
+
+
+
+#### `CountDownLatch`和`CyclicBarrier`的区别
+
+它们都可以实现线程之间的相互等待。
+
+`CountDownLatch`侧重于一个线程A等待其他线程都执行完某些或所有任务后，线程A才能继续执行，类似于`thread.join()`的作用。
+
+`CyclicBarrier`侧重于让所有线程都执行到某个同步点然后统一继续向下执行。
+
+不同的是`CyclicBarrier`可以重用。
+
+[Java中的并发工具类](https://inewbie.top/2019/12/02/Java%E4%B8%AD%E7%9A%84%E5%B9%B6%E5%8F%91%E5%B7%A5%E5%85%B7%E7%B1%BB/#more)
 
